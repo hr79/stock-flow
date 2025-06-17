@@ -1,9 +1,9 @@
 package com.example.stockflow;
 
-import com.example.stockflow.model.Product;
-import com.example.stockflow.model.Supplier;
-import com.example.stockflow.repository.ProductRepository;
-import com.example.stockflow.repository.SupplierRepository;
+import com.example.stockflow.domain.product.Product;
+import com.example.stockflow.domain.supplier.Supplier;
+import com.example.stockflow.domain.product.ProductRepository;
+import com.example.stockflow.domain.supplier.SupplierRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
