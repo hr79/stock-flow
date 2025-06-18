@@ -7,6 +7,6 @@ import java.util.List;
 import java.util.Optional;
 
 public interface PurchaseOrderItemRepository extends JpaRepository<PurchaseOrderItem, Long> {
-
-    @EntityGraph(attributePaths = {"product"}) Optional<List<PurchaseOrderItem>> findAllByPurchaseOrderId(Long PurchaseOrderId);
+    @EntityGraph(attributePaths = {"product"})
+    Optional<List<PurchaseOrderItem>> findAllByPurchaseOrderId(Long PurchaseOrderId);
 }
