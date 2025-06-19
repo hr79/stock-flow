@@ -1,6 +1,7 @@
 package com.example.stockflow.domain.inbound;
 
 import com.example.stockflow.common.ApiResponse;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -16,6 +17,7 @@ public class InboundController {
     private final InboundService inboundService;
 
     // 입고 등록
+    @Operation(summary = "입고 등록")
     @PostMapping("/warehousing")
     public ApiResponse<?> registerWarehousing(@RequestBody InboundRequestDto requestDto) {
         List<InboundResponseDto> responseDtoList = inboundService.registerWarehousing(requestDto);
