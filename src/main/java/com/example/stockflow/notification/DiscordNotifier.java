@@ -11,7 +11,9 @@ import java.util.Map;
 @Component("discordNotifier")
 @Slf4j
 public class DiscordNotifier implements Notifier {
-    private static final String WEBHOOK_URL = "https://discord.com/api/webhooks/1383768893281140888/Yioyw-zsocX9SAE0sGPQk4s48OK8WP7_NTBrhQwzQDccAKDEWgMeDSjDmELrjtxbeZQe";
+
+
+    private static final String WEBHOOK_URL = "***REMOVED***";
 
     private final WebClient webClient;
 
