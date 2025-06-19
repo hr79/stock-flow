@@ -1,6 +1,7 @@
 package com.example.stockflow.notification;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -11,7 +12,7 @@ import java.util.Map;
 @Component("discordNotifier")
 @Slf4j
 public class DiscordNotifier implements Notifier {
-    private static final String WEBHOOK_URL = "https://discord.com/api/webhooks/1383768893281140888/Yioyw-zsocX9SAE0sGPQk4s48OK8WP7_NTBrhQwzQDccAKDEWgMeDSjDmELrjtxbeZQe";
+    @Value("${notifier.discord}") private static String WEBHOOK_URL;
 
     private final WebClient webClient;
 
