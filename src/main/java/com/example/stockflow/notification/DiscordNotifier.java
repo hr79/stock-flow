@@ -12,8 +12,7 @@ import java.util.Map;
 @Component("discordNotifier")
 @Slf4j
 public class DiscordNotifier implements Notifier {
-    @Value("${notifier.discord}") private static String WEBHOOK_URL;
-
+    @Value("${notifier.discord}") private String WEBHOOK_URL;
     private final WebClient webClient;
 
     public DiscordNotifier() {
