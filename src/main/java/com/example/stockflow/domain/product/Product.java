@@ -23,11 +23,14 @@ public class Product {
     @Column
     private int currentStock;
 
+    @Column
+    private int threshold; // 임계치 : 재고가 임계치 이하일때 알림
 
     @Builder
-    public Product(String name, BigDecimal price, int currentStock) {
+    public Product(String name, BigDecimal price, int currentStock, Integer threshold) {
         this.name = name;
         this.price = price;
         this.currentStock = currentStock;
+        this.threshold = (threshold == null) ? 100 : threshold;
     }
 }

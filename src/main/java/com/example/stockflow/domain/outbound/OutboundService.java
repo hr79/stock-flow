@@ -88,6 +88,12 @@ public class OutboundService {
             // 재고 감소
             int updatedStock = updateStock(orderItem, quantity);
 
+            // 재고가 임계치보다 낮으면 알림
+            int threshold = orderItem.getProduct().getThreshold();
+            if (updatedStock <= threshold) {
+                notifier.notify(productName + " 제품의 재고가 " + updatedStock + "개 입니다. 재고 수량을 " + threshold + "개가 넘도록 채워주세요.");
+            }
+
             // 출고한 수량 업데이트
             int releasedQuantity = orderItem.getReleasedQuantity();
             orderItem.setReleasedQuantity(releasedQuantity + quantity);
@@ -116,7 +122,6 @@ public class OutboundService {
             return updatedStock;
         } else {
             throw new IllegalArgumentException("not enough stock");
-//            return currentStock;
         }
     }
 
