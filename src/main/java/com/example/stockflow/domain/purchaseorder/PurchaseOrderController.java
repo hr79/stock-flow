@@ -27,12 +27,12 @@ public class PurchaseOrderController {
         return ApiResponse.success("/purchase-order", respDto);
     }
 
-//    @Operation(summary = "발주 조회")
-//    @GetMapping("/purchase-order/{id}")
-//    public ApiResponse<?> getPurchaseOrder(@PathVariable String id) {
-//        purchaseOrderService.getPurchaseOrder(id);
-//        return ApiResponse.success("/purchase-order", id);
-//    }
+    @Operation(summary = "발주 조회")
+    @GetMapping("/purchase-order/{id}")
+    public ApiResponse<?> getPurchaseOrder(@PathVariable String id) {
+        PurchaseOrderDetailResponseDto responseDto = purchaseOrderService.getPurchaseOrder(id);
+        return ApiResponse.success("/purchase-order", responseDto);
+    }
 
     // 발주 목록 조회
     @Operation(summary = "발주 목록 조회")
