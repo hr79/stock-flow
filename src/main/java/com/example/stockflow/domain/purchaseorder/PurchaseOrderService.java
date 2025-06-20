@@ -45,10 +45,6 @@ public class PurchaseOrderService {
     private PurchaseOrder createPurchaseOrder(List<ProductDto> productsAndQuantity, List<PurchaseOrderItem> purchaseOrderItems) {
         PurchaseOrder purchaseOrder = new PurchaseOrder();
         BigDecimal allProductsTotalPrice = BigDecimal.ZERO;
-//        List<String> nameList = new ArrayList<>();
-//        for (ProductDto productDto : productsAndQuantity) {
-//            nameList.add(productDto.getProduct());
-//        }
         List<String> nameList = productsAndQuantity.stream().map(ProductDto::getProduct).toList();
         log.info("nameList: {}", nameList);
         List<Product> productList = productRepository.findProductsByNameIn(nameList);
@@ -67,17 +63,6 @@ public class PurchaseOrderService {
             purchaseOrderItems.add(purchaseOrderItem);
             allProductsTotalPrice = allProductsTotalPrice.add(purchaseOrderItem.getTotalPrice());
         }
-
-//        for (ProductDto productAndQuantity : productsAndQuantity) {
-//            Product product = productRepository.findByName(productAndQuantity.getProduct())
-//                    .orElseThrow(() -> new IllegalArgumentException("Product not found: " + productAndQuantity.getProduct()));
-//            PurchaseOrderItem purchaseOrderItem = purchaseOrderMapper.toEntity(purchaseOrder, productAndQuantity, product);
-//
-//            purchaseOrderItems.add(purchaseOrderItem);
-//
-//            // 제품 * 수량 가격 합산
-//            allProductsTotalPrice = allProductsTotalPrice.add(purchaseOrderItem.getTotalPrice());
-//        }
         purchaseOrder.setTotalPrice(allProductsTotalPrice);
 
         return purchaseOrder;
@@ -109,5 +94,25 @@ public class PurchaseOrderService {
         }
 
         return responseDtos;
+    }
+
+    public PurchaseOrderDetailResponseDto getPurchaseOrder(String id) {
+        Long purchaseOrderId = Long.parseLong(id);
+        PurchaseOrder purchaseOrder = purchaseOrderRepository.findById(purchaseOrderId).orElseThrow(() -> new IllegalArgumentException("발주를 찾을 수 없습니다."));
+        List<PurchaseOrderItem> purchaseOrderItemList = purchaseOrderItemRepository.findAllByPurchaseOrderId(purchaseOrderId).orElseThrow(() -> new IllegalArgumentException("상세 발주 물품들을 찾을 수 없습니다"));
+        List<ItemDto> itemDtoList = new ArrayList<>();
+
+        for (PurchaseOrderItem orderItem : purchaseOrderItemList) {
+            ItemDto itemDto = ItemDto.builder()
+                    .productName(orderItem.getProduct().getName())
+                    .currentStock(orderItem.getProduct().getCurrentStock())
+                    .requiredQuantity(orderItem.getRequiredQuantity())
+                    .receivedQuantity(orderItem.getReceivedQuantity())
+                    .status(orderItem.getStatus())
+                    .build();
+            itemDtoList.add(itemDto);
+        }
+
+        return new PurchaseOrderDetailResponseDto(purchaseOrderId, itemDtoList, purchaseOrder.getCreatedAt().toString());
     }
 }
