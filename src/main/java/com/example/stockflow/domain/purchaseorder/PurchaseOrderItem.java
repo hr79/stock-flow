@@ -24,6 +24,7 @@ public class PurchaseOrderItem extends BaseEntity {
     @JoinColumn
     private Product product;
 
+    @Setter
     @Column(nullable = false)
     private int requiredQuantity;
 
