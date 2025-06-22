@@ -1,0 +1,15 @@
+# Stock Flow
+
+## 📌 프로젝트 개요
+
+## 🔗 ERD
+![erd](https://private-user-images.githubusercontent.com/194618981/457632048-c24a427e-bfd3-4751-a17d-2e9d440730ac.png?jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3NTA1ODEzMjgsIm5iZiI6MTc1MDU4MTAyOCwicGF0aCI6Ii8xOTQ2MTg5ODEvNDU3NjMyMDQ4LWMyNGE0MjdlLWJmZDMtNDc1MS1hMTdkLTJlOWQ0NDA3MzBhYy5wbmc_WC1BbXotQWxnb3JpdGhtPUFXUzQtSE1BQy1TSEEyNTYmWC1BbXotQ3JlZGVudGlhbD1BS0lBVkNPRFlMU0E1M1BRSzRaQSUyRjIwMjUwNjIyJTJGdXMtZWFzdC0xJTJGczMlMkZhd3M0X3JlcXVlc3QmWC1BbXotRGF0ZT0yMDI1MDYyMlQwODMwMjhaJlgtQW16LUV4cGlyZXM9MzAwJlgtQW16LVNpZ25hdHVyZT0wYTdjNTg0MWE4YzZkNzkzNzE2YjIyNjA0YWU5MmZiODdkMDM1MzVlZmJiOTNjZmM2YTA5ZDk5YzliZTViMjNmJlgtQW16LVNpZ25lZEhlYWRlcnM9aG9zdCJ9.MYAApuaxELIEzBqM5URdUM2u41yY6VflvOpjGIs2a9A)
+
+## 🚀 Key Features
+
+## 📈 Enhancements
+
+## 🛠️ Trouble Shooting
+
+## 🐞 Bug Fixing
+
