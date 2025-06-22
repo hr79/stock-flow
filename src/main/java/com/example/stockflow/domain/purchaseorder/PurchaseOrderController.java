@@ -34,6 +34,14 @@ public class PurchaseOrderController {
         return ApiResponse.success("/purchase-order", responseDto);
     }
 
+    @Operation(summary = "발주 수정")
+    @PatchMapping("/purchase-order/{id}")
+    public ApiResponse<?> updatePurchaseOrder(@PathVariable("id") String id, @RequestBody PurchaseOrderRequestDto requestDto) {
+        PurchaseOrderDetailResponseDto responseDto = purchaseOrderService.updatePurchaseOrder(id, requestDto);
+
+        return ApiResponse.success("/purchase-order/{id}", responseDto);
+    }
+
     // 발주 목록 조회
     @Operation(summary = "발주 목록 조회")
     @GetMapping("/purchase-order")
