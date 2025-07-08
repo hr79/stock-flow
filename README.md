@@ -1,11 +1,42 @@
-# Stock Flow
+# 📦 Stock Flow
 
 ## 📌 프로젝트 개요
 
+**StockFlow**는 중소 제조·유통 기업을 위한 **B2B 재고 흐름 관리 백엔드 시스템**입니다. 발주, 입고, 재고, 출고의 전반적인 흐름을 반영한 도메인 기반 아키텍처로 설계되었으며, 단순 CRUD를 넘어 출고 가능 여부 판단 및 재고 부족 시의 대응까지 포함하여 실무에 근접한 시나리오를 구현했습니다.
+
+> 본 프로젝트는 백엔드 단독 구성으로, UI 없이 API 단위의 데이터 흐름 구현에 집중되어 있습니다.
+
+  <br>
+
+### 🏢 **B2B 시나리오 (기업 내부 프로세스 자동화)**
+
+| 단계         | 설명                             |
+| ---------- | ------------------------------ |
+| 1️⃣ 발주 등록  | 구매 담당자가 공급업체에 A상품 100개 주문      |
+| 2️⃣ 입고 처리  | 공급업체가 상품을 보내오면, 창고에 입고됨        |
+| 3️⃣ 재고 반영  | 재고 수량 +100                     |
+| 4️⃣ 출고 처리  | 다른 지점에 보내거나 고객 주문 시 출고 → 재고 감소 |
+| 5️⃣ 임계치 알림 | 재고가 최소 수량보다 떨어지면 자동 알림 발생      |
+
+<br>
+
 ## 🔗 ERD
-![erd](https://private-user-images.githubusercontent.com/194618981/457632048-c24a427e-bfd3-4751-a17d-2e9d440730ac.png?jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3NTA1ODEzMjgsIm5iZiI6MTc1MDU4MTAyOCwicGF0aCI6Ii8xOTQ2MTg5ODEvNDU3NjMyMDQ4LWMyNGE0MjdlLWJmZDMtNDc1MS1hMTdkLTJlOWQ0NDA3MzBhYy5wbmc_WC1BbXotQWxnb3JpdGhtPUFXUzQtSE1BQy1TSEEyNTYmWC1BbXotQ3JlZGVudGlhbD1BS0lBVkNPRFlMU0E1M1BRSzRaQSUyRjIwMjUwNjIyJTJGdXMtZWFzdC0xJTJGczMlMkZhd3M0X3JlcXVlc3QmWC1BbXotRGF0ZT0yMDI1MDYyMlQwODMwMjhaJlgtQW16LUV4cGlyZXM9MzAwJlgtQW16LVNpZ25hdHVyZT0wYTdjNTg0MWE4YzZkNzkzNzE2YjIyNjA0YWU5MmZiODdkMDM1MzVlZmJiOTNjZmM2YTA5ZDk5YzliZTViMjNmJlgtQW16LVNpZ25lZEhlYWRlcnM9aG9zdCJ9.MYAApuaxELIEzBqM5URdUM2u41yY6VflvOpjGIs2a9A)
+![erd](https://github.com/user-attachments/assets/c24a427e-bfd3-4751-a17d-2e9d440730ac)
+
 
 ## 🚀 Key Features
+
+## 💡 주요 기능
+
+| 기능       | 설명                                      |
+| -------- | --------------------------------------- |
+| 발주 생성    | 품목 리스트를 기반으로 총액 계산 후 저장                 |
+| 입고 처리    | 발주 기준으로 입고 → 재고 수량 증가                   |
+| 출고 요청    | 현재 재고량을 비교하여 출고 가능 여부 판단                |
+| 출고 완료 처리 | 출고 이력 저장 및 재고 수량 차감                     |
+| 예외 처리    | 잘못된 요청/재고 부족 시 일관된 에러 메시지 반환            |
+| API 문서화  | Swagger UI 자동 생성, `/swagger-ui.html` 제공 |
+
 
 ## 📈 Enhancements
 
