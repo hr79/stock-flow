@@ -1,4 +1,4 @@
-,# 📦 Stock Flow
+# 📦 Stock Flow
 
 ## 📌 프로젝트 개요
 
@@ -23,14 +23,17 @@
 ## 🔗 ERD
 ![erd](https://github.com/user-attachments/assets/c24a427e-bfd3-4751-a17d-2e9d440730ac)
 
+<br>
+
 ## 🛠 기술 스택
 
-Java 21
-Spring Boot 3.2
-Spring Data JPA (Hibernate)
-MySQL
-Springdoc OpenAPI 2 (Swagger UI)
+- Java 21
+- Spring Boot 3.2
+- Spring Data JPA (Hibernate)
+- MySQL
+- Springdoc OpenAPI 2 (Swagger UI)
 
+<br>
 
 ## 💡 주요 기능 및 흐름
 
@@ -43,8 +46,25 @@ Springdoc OpenAPI 2 (Swagger UI)
 | 예외 처리    | 잘못된 요청/재고 부족 시 일관된 에러 메시지 반환            |
 | API 문서화  | Swagger UI 자동 생성, `/swagger-ui.html` 제공 |
 
-## 🧩 패키지 구조
+<br>
 
+## 🧩 패키지 구조
+```
+.
+├── common
+├── domain
+│   ├── inbound
+│   ├── outbound
+│   │   └── dto
+│   ├── product
+│   ├── purchaseorder
+│   │   └── dto
+│   └── supplier
+├── model
+└── notification
+```
+
+<br>
 
 ## 🌱 향후 확장 포인트 (예정 또는 고려 사항)
 
