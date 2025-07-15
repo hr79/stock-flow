@@ -23,24 +23,25 @@
 ## 🔗 ERD
 ![erd](https://github.com/user-attachments/assets/c24a427e-bfd3-4751-a17d-2e9d440730ac)
 
+## 🛠 기술 스택
 
-## 🚀 Key Features
+Java 21
+Spring Boot 3.2
+Spring Data JPA (Hibernate)
+MySQL
+Springdoc OpenAPI 2 (Swagger UI)
 
-## 💡 주요 기능
+
+## 💡 주요 기능 및 흐름
 
 | 기능       | 설명                                      |
 | -------- | --------------------------------------- |
-| 발주 생성    | 품목 리스트를 기반으로 총액 계산 후 저장                 |
+| 발주 생성 (PurchaseOrder)    | 품목 리스트를 기반으로 총액 계산 후 저장                 |
 | 입고 처리    | 발주 기준으로 입고 → 재고 수량 증가                   |
 | 출고 요청    | 현재 재고량을 비교하여 출고 가능 여부 판단                |
 | 출고 완료 처리 | 출고 이력 저장 및 재고 수량 차감                     |
 | 예외 처리    | 잘못된 요청/재고 부족 시 일관된 에러 메시지 반환            |
 | API 문서화  | Swagger UI 자동 생성, `/swagger-ui.html` 제공 |
 
-
-## 📈 Enhancements
-
-## 🛠️ Trouble Shooting
-
-## 🐞 Bug Fixing
+## 🧩 패키지 구조
 
