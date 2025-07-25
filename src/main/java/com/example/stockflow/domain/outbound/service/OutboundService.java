@@ -1,5 +1,6 @@
-package com.example.stockflow.domain.outbound;
+package com.example.stockflow.domain.outbound.service;
 
+import com.example.stockflow.domain.outbound.*;
 import com.example.stockflow.domain.outbound.dto.OutboundOrderRequestDto;
 import com.example.stockflow.domain.outbound.dto.OutboundOrderResponseDto;
 import com.example.stockflow.domain.outbound.dto.OutboundRequestDto;
@@ -17,6 +18,10 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -28,19 +33,22 @@ public class OutboundService {
     private final OutboundRepository outboundRepository;
     private final OutboundOrderMapper mapper;
     private final Notifier notifier;
+    private final ExecutorService executorService = Executors.newFixedThreadPool(8);
+    private final OutboundProcessorService outboundProcessorService;
 
-    public OutboundService(ProductRepository productRepository, OutboundOrderRepository outboundOrderRepository, OutboundOrderItemRepository outboundOrderItemRepository, OutboundRepository outboundRepository, OutboundOrderMapper mapper, @Qualifier("discordNotifier") Notifier notifier) {
+    public OutboundService(ProductRepository productRepository, OutboundOrderRepository outboundOrderRepository, OutboundOrderItemRepository outboundOrderItemRepository, OutboundRepository outboundRepository, OutboundOrderMapper mapper, @Qualifier("discordNotifier") Notifier notifier, OutboundProcessorService outboundProcessorService) {
         this.productRepository = productRepository;
         this.outboundOrderRepository = outboundOrderRepository;
         this.outboundOrderItemRepository = outboundOrderItemRepository;
         this.outboundRepository = outboundRepository;
         this.mapper = mapper;
         this.notifier = notifier;
+        this.outboundProcessorService = outboundProcessorService;
     }
 
     // 출고 요청
     @Transactional
-    public OutboundOrderResponseDto createOutboundRequest(OutboundOrderRequestDto outboundOrderRequestDto) {
+    public OutboundOrderResponseDto createOutboundOrder(OutboundOrderRequestDto outboundOrderRequestDto) {
         String destination = outboundOrderRequestDto.getDestination();
         OutboundOrder outboundOrder = OutboundOrder.builder().destination(destination).build();
         outboundOrderRepository.save(outboundOrder);
@@ -68,8 +76,9 @@ public class OutboundService {
 
     // 출고 등록
     @Transactional
-    public List<OutboundResponseDto> registerOutbound(OutboundRequestDto outboundRequestDto) {
-        Map<String, OutboundOrderItem> outboundOrderItemMap = getOutboundOrderItemMap(outboundRequestDto);
+    public List<OutboundResponseDto> createOutbound(OutboundRequestDto outboundRequestDto) {
+        // 출고 요청 제품들 가져와서 map
+        Map<String, OutboundOrderItem> outboundOrderItemMap = getOutboundOrderItemMap(outboundRequestDto.getOutboundId());
 
         ArrayList<Outbound> outboundList = new ArrayList<>();
         ArrayList<OutboundResponseDto> responseDtoList = new ArrayList<>();
@@ -118,6 +127,7 @@ public class OutboundService {
             log.info("updated stock: {}", updatedStock);
 
             orderItem.getProduct().setCurrentStock(updatedStock);
+            outboundOrderItemRepository.save(orderItem);
 
             return updatedStock;
         } else {
@@ -134,8 +144,43 @@ public class OutboundService {
         }
     }
 
-    private Map<String, OutboundOrderItem> getOutboundOrderItemMap(OutboundRequestDto outboundRequestDto) {
-        List<OutboundOrderItem> outboundOrderItemList = outboundOrderItemRepository.findByOutboundOrderId(outboundRequestDto.getOutboundId());
+    private Map<String, OutboundOrderItem> getOutboundOrderItemMap(Long outboundOrderId) {
+        List<OutboundOrderItem> outboundOrderItemList = outboundOrderItemRepository.findByOutboundOrderId(outboundOrderId);
+
+        return outboundOrderItemList.stream().collect(Collectors.toMap(
+                outboundOrderItem -> outboundOrderItem.getProduct().getName(),
+                outboundOrderItem -> outboundOrderItem
+        ));
+    }
+
+
+    // 출고 등록 & 처리(멀티스레딩 적용)
+    public List<OutboundResponseDto> createOutboundWithMultiThreading(OutboundRequestDto outboundRequestDto) {
+        Map<String, OutboundOrderItem> orderItemMap = getOutboundOrderItemMapForMultiThreading(outboundRequestDto.getOutboundId());
+
+        // 병렬 처리
+        List<CompletableFuture<OutboundResponseDto>> futures = outboundRequestDto.getProductList()
+                .stream()
+                .map(productDto -> CompletableFuture.supplyAsync(
+                        () -> outboundProcessorService.proccessOutbound(productDto, orderItemMap), executorService
+                ))
+                .toList();
+
+        return futures.stream()
+                .map(future -> {
+                            try {
+                                return future.join(); // 결과 수집
+                            } catch (CompletionException e) {
+                                Throwable cause = e.getCause() != null ? e.getCause() : e;
+                                throw new RuntimeException("출고 처리 실패 : " + cause.getMessage(), cause);
+                            }
+                        }
+                ).toList();
+    }
+
+    private Map<String, OutboundOrderItem> getOutboundOrderItemMapForMultiThreading(Long outboundOrderId) {
+        List<OutboundOrderItem> outboundOrderItemList = outboundOrderItemRepository.findOutboundOrderItemsWithProductByOutboundOrderId(outboundOrderId);
+
         return outboundOrderItemList.stream().collect(Collectors.toMap(
                 outboundOrderItem -> outboundOrderItem.getProduct().getName(),
                 outboundOrderItem -> outboundOrderItem

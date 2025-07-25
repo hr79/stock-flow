@@ -5,6 +5,7 @@ import com.example.stockflow.domain.outbound.dto.OutboundOrderRequestDto;
 import com.example.stockflow.domain.outbound.dto.OutboundOrderResponseDto;
 import com.example.stockflow.domain.outbound.dto.OutboundRequestDto;
 import com.example.stockflow.domain.outbound.dto.OutboundResponseDto;
+import com.example.stockflow.domain.outbound.service.OutboundService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -23,8 +24,8 @@ public class OutboundController {
     // 출고 요청
     @Operation(summary = "출고 요청")
     @PostMapping("/outbound-request")
-    public ApiResponse<?> createOutboundRequest(@RequestBody OutboundOrderRequestDto requestDto) {
-        OutboundOrderResponseDto responseDto = outboundService.createOutboundRequest(requestDto);
+    public ApiResponse<?> createOutboundOrder(@RequestBody OutboundOrderRequestDto requestDto) {
+        OutboundOrderResponseDto responseDto = outboundService.createOutboundOrder(requestDto);
 
         return ApiResponse.success("/outbound-request", responseDto);
     }
@@ -33,7 +34,7 @@ public class OutboundController {
     @Operation(summary = "출고 등록")
     @PostMapping("/outbound")
     public ApiResponse<?> registerOutbound(@RequestBody OutboundRequestDto requestDto) {
-        List<OutboundResponseDto> responseDtoList = outboundService.registerOutbound(requestDto);
+        List<OutboundResponseDto> responseDtoList = outboundService.createOutboundWithMultiThreading(requestDto);
 
         return ApiResponse.success("/outbound", responseDtoList);
     }

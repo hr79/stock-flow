@@ -26,6 +26,9 @@ public class Product {
     @Column
     private int threshold; // 임계치 : 재고가 임계치 이하일때 알림
 
+    @Version
+    private Long version;
+
     @Builder
     public Product(String name, BigDecimal price, int currentStock, Integer threshold) {
         this.name = name;
