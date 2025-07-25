@@ -48,6 +48,11 @@
 
 <br>
 
+## 📈 Enhancement
+- [멀티스레딩 기반 출고 처리 성능 최적화 (Spring Boot + JPA)](https://www.notion.so/Spring-Boot-JPA-23be74104e0880c38dbfcc284be84efe?source=copy_link)
+
+<br>
+
 ## 🧩 패키지 구조
 ```
 .
