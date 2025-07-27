@@ -30,17 +30,17 @@ class RegisterOutboundTest {
     private ProductRepository productRepository;
 
     @Autowired
-    private OutboundOrderRepository outboundOrderRepository;
+    private OutboundRequestRepository outboundRequestRepository;
 
-    @Autowired private OutboundOrderItemRepository outboundOrderItemRepository;
+    @Autowired private OutboundRequestItemRepository outboundRequestItemRepository;
 
     //테스트용 제품 데이터 생성
     @BeforeEach
     void setUp() {
         System.out.println("▶ 테스트 데이터 준비 중...");
         List<Product> products = new ArrayList<>();
-        OutboundOrder outboundOrder = new OutboundOrder("거래처", OrderStatus.REQUESTED.toString());
-        List<OutboundOrderItem> outboundOrderItemList = new ArrayList<>();
+        OutboundRequest outboundRequest = new OutboundRequest("거래처", OrderStatus.REQUESTED.toString());
+        List<OutboundRequestItem> outboundRequestItemList = new ArrayList<>();
 
         for (int i = 0; i < 10000; i++) {
 
@@ -53,18 +53,18 @@ class RegisterOutboundTest {
 
             products.add(product);
 
-            OutboundOrderItem orderItem = OutboundOrderItem.builder().
-                    outboundOrder(outboundOrder)
+            OutboundRequestItem orderItem = OutboundRequestItem.builder().
+                    outboundOrder(outboundRequest)
                     .product(product)
                     .requiredQuantity(1)
                     .status(OrderStatus.REQUESTED.toString())
                     .build();
 
-            outboundOrderItemList.add(orderItem);
+            outboundRequestItemList.add(orderItem);
         }
         productRepository.saveAll(products);
-        outboundOrderRepository.save(outboundOrder);
-        outboundOrderItemRepository.saveAll(outboundOrderItemList);
+        outboundRequestRepository.save(outboundRequest);
+        outboundRequestItemRepository.saveAll(outboundRequestItemList);
     }
 
     private OutboundRequestDto createTestRequestDto() {
@@ -93,7 +93,7 @@ class RegisterOutboundTest {
 
         // ✅ 멀티스레드 실행
         stopWatch.start("멀티스레드 처리");
-        outboundService.createOutboundWithMultiThreading(requestDto); // 병렬 처리 메서드
+        outboundService.fulfillOutboundRequestWithMultiThreading(requestDto); // 병렬 처리 메서드
         stopWatch.stop();
 
         System.out.println("▶ 처리 시간 비교");

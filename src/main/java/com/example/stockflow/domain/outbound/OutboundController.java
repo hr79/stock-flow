@@ -1,8 +1,8 @@
 package com.example.stockflow.domain.outbound;
 
 import com.example.stockflow.common.ApiResponse;
-import com.example.stockflow.domain.outbound.dto.OutboundOrderRequestDto;
-import com.example.stockflow.domain.outbound.dto.OutboundOrderResponseDto;
+import com.example.stockflow.domain.outbound.dto.CreateOutboundRequestDto;
+import com.example.stockflow.domain.outbound.dto.CreateOutboundResponseDto;
 import com.example.stockflow.domain.outbound.dto.OutboundRequestDto;
 import com.example.stockflow.domain.outbound.dto.OutboundResponseDto;
 import com.example.stockflow.domain.outbound.service.OutboundService;
@@ -24,8 +24,8 @@ public class OutboundController {
     // 출고 요청
     @Operation(summary = "출고 요청")
     @PostMapping("/outbound-request")
-    public ApiResponse<?> createOutboundOrder(@RequestBody OutboundOrderRequestDto requestDto) {
-        OutboundOrderResponseDto responseDto = outboundService.createOutboundOrder(requestDto);
+    public ApiResponse<?> createOutboundRequest(@RequestBody CreateOutboundRequestDto requestDto) {
+        CreateOutboundResponseDto responseDto = outboundService.createOutboundRequest(requestDto);
 
         return ApiResponse.success("/outbound-request", responseDto);
     }
@@ -33,8 +33,8 @@ public class OutboundController {
     // 출고 등록
     @Operation(summary = "출고 등록")
     @PostMapping("/outbound")
-    public ApiResponse<?> registerOutbound(@RequestBody OutboundRequestDto requestDto) {
-        List<OutboundResponseDto> responseDtoList = outboundService.createOutboundWithMultiThreading(requestDto);
+    public ApiResponse<?> fulfillOutboundRequest(@RequestBody OutboundRequestDto requestDto) {
+        List<OutboundResponseDto> responseDtoList = outboundService.fulfillOutboundRequestWithMultiThreading(requestDto);
 
         return ApiResponse.success("/outbound", responseDtoList);
     }
