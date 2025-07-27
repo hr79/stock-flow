@@ -108,5 +108,4 @@ public class InboundService {
         purchaseOrderItemRepository.save(orderItem);
         return currentStock + quantity;
     }
-
 }

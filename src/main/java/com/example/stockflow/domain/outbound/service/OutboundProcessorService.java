@@ -4,7 +4,6 @@ import com.example.stockflow.domain.outbound.*;
 import com.example.stockflow.domain.outbound.dto.OutboundResponseDto;
 import com.example.stockflow.domain.product.Product;
 import com.example.stockflow.domain.product.ProductDto;
-import com.example.stockflow.domain.product.ProductRepository;
 import com.example.stockflow.model.OrderStatus;
 import com.example.stockflow.notification.Notifier;
 import jakarta.persistence.OptimisticLockException;
@@ -16,34 +15,25 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 @Slf4j
 @Service
 public class OutboundProcessorService {
 
-    private final ProductRepository productRepository;
-    private final OutboundOrderRepository outboundOrderRepository;
-    private final OutboundOrderItemRepository outboundOrderItemRepository;
-    private final OutboundRepository outboundRepository;
-    private final OutboundOrderMapper mapper;
+    private final OutboundRequestItemRepository outboundRequestItemRepository;
     private final Notifier notifier;
-    private final ExecutorService executorService = Executors.newFixedThreadPool(4);
 
-    public OutboundProcessorService(ProductRepository productRepository, OutboundOrderRepository outboundOrderRepository, OutboundOrderItemRepository outboundOrderItemRepository, OutboundRepository outboundRepository, OutboundOrderMapper mapper, @Qualifier("discordNotifier") Notifier notifier) {
-        this.productRepository = productRepository;
-        this.outboundOrderRepository = outboundOrderRepository;
-        this.outboundOrderItemRepository = outboundOrderItemRepository;
-        this.outboundRepository = outboundRepository;
-        this.mapper = mapper;
+    public OutboundProcessorService(
+            OutboundRequestItemRepository outboundRequestItemRepository,
+            @Qualifier("discordNotifier") Notifier notifier) {
+        this.outboundRequestItemRepository = outboundRequestItemRepository;
         this.notifier = notifier;
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public OutboundResponseDto proccessOutbound(ProductDto productDto, Map<String, OutboundOrderItem> orderItemMap) {
+    public OutboundResponseDto proccessOutbound(ProductDto productDto, Map<String, OutboundRequestItem> orderItemMap) {
         String productName = productDto.getProduct();
-        OutboundOrderItem orderItem = orderItemMap.get(productName);
+        OutboundRequestItem orderItem = orderItemMap.get(productName);
         if (orderItem == null) {
             throw new IllegalArgumentException("출고 요청 제품이 아닙니다. : " + productName);
         }
@@ -70,7 +60,7 @@ public class OutboundProcessorService {
         return new OutboundResponseDto(productName, quantity, updatedStock);
     }
 
-    private int updateStockWithRetry(OutboundOrderItem orderItem, int quantity) {
+    private int updateStockWithRetry(OutboundRequestItem orderItem, int quantity) {
         int maxRetries = 3;
 
         for (int retryCount = 1; retryCount <= maxRetries; retryCount++) {
@@ -81,7 +71,7 @@ public class OutboundProcessorService {
                 }
                 int updatedQuantity = currentStock - quantity;
                 orderItem.getProduct().setCurrentStock(updatedQuantity);
-                outboundOrderItemRepository.saveAndFlush(orderItem);
+                outboundRequestItemRepository.saveAndFlush(orderItem);
 
                 return updatedQuantity;
             } catch (OptimisticLockException e) {
@@ -99,7 +89,7 @@ public class OutboundProcessorService {
         throw new ConcurrencyFailureException("재고 업데이트 실패");
     }
 
-    private static void setOutboundOrderStatus(OutboundOrderItem orderItem) {
+    private static void setOutboundOrderStatus(OutboundRequestItem orderItem) {
         if (orderItem.getReleasedQuantity() < orderItem.getRequiredQuantity()) {
             orderItem.setStatus(OrderStatus.IN_PROGRESS.toString());
         }

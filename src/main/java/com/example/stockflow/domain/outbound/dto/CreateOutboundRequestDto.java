@@ -6,7 +6,7 @@ import lombok.Getter;
 import java.util.List;
 
 @Getter
-public class OutboundOrderRequestDto {
+public class CreateOutboundRequestDto {
     private List<ProductDto> products;
     private String destination;
 }
