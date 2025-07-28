@@ -90,6 +90,8 @@
 
 - 자세히: [멀티스레딩 기반 출고 처리 성능 최적화 (Spring Boot + JPA) (Notion)](https://www.notion.so/Spring-Boot-JPA-23be74104e0880c38dbfcc284be84efe?source=copy_link)
 
+<br>
+
 ### ✅ 재고 임계치 알림 (Discord Webhook)
 - 적용 이유: 실시간 재고 모니터링 → 운영자가 즉시 대응 가능해야 함
 
@@ -103,7 +105,11 @@
   - 확장성 → Slack, Email 알림으로 쉽게 전환 가능
 
 - 예시 알림:
-    ![discord-notification](https://github.com/user-attachments/assets/ff76583e-72ec-4c59-ab72-a718922e50d8)
+<br>
+  <img src="https://github.com/user-attachments/assets/ff76583e-72ec-4c59-ab72-a718922e50d8" width=70% height=70%>
+
+[//]: # (    ![discord-notification]&#40;https://github.com/user-attachments/assets/ff76583e-72ec-4c59-ab72-a718922e50d8&#41;)
+
 <br>
 
 ## 🐞Bug Fixing
