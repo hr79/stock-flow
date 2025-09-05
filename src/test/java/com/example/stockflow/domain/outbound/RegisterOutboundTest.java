@@ -7,11 +7,19 @@ import com.example.stockflow.domain.product.ProductDto;
 import com.example.stockflow.domain.product.ProductRepository;
 import com.example.stockflow.model.OrderStatus;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.util.StopWatch;
+import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -21,7 +29,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 @ActiveProfiles("test")
+@Testcontainers
 class RegisterOutboundTest {
+    private static final Logger log = LoggerFactory.getLogger(RegisterOutboundTest.class);
 
     @Autowired
     private OutboundService outboundService;
@@ -34,10 +44,25 @@ class RegisterOutboundTest {
 
     @Autowired private OutboundOrderItemRepository outboundOrderItemRepository;
 
-    //테스트용 제품 데이터 생성
+    @Container
+    static PostgreSQLContainer<?> postgres =
+            new PostgreSQLContainer<>("postgres:16")
+                    .withDatabaseName("testdb")
+                    .withUsername("test")
+                    .withPassword("test");
+
+    @DynamicPropertySource
+    static void configureProperties(DynamicPropertyRegistry registry) {
+        log.info(":::: configureProperties");
+        registry.add("spring.datasource.url", postgres::getJdbcUrl);
+        registry.add("spring.datasource.username", postgres::getUsername);
+        registry.add("spring.datasource.password", postgres::getPassword);
+        registry.add("spring.datasource.driver-class-name", () -> "org.postgresql.Driver"); // 추가
+    }
+
     @BeforeEach
     void setUp() {
-        System.out.println("▶ 테스트 데이터 준비 중...");
+        System.out.println(":::: 테스트 데이터 준비 중...");
         List<Product> products = new ArrayList<>();
         OutboundOrder outboundOrder = new OutboundOrder("거래처", OrderStatus.REQUESTED.toString());
         List<OutboundOrderItem> outboundOrderItemList = new ArrayList<>();
@@ -78,6 +103,7 @@ class RegisterOutboundTest {
     }
 
     @Test
+    @DisplayName("싱글스레드 vs 멀티스레드 처리 테스트")
     void compareRegisterOutboundWithAndWithoutMultiThreading() {
         StopWatch stopWatch = new StopWatch();
 

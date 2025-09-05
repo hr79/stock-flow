@@ -5,98 +5,80 @@ import com.example.stockflow.domain.outbound.dto.OutboundResponseDto;
 import com.example.stockflow.domain.product.Product;
 import com.example.stockflow.domain.product.ProductDto;
 import com.example.stockflow.domain.product.ProductRepository;
+import com.example.stockflow.domain.product.StockService;
 import com.example.stockflow.model.OrderStatus;
 import com.example.stockflow.notification.Notifier;
-import jakarta.persistence.OptimisticLockException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.dao.ConcurrencyFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.List;
 
 @Slf4j
 @Service
 public class OutboundProcessorService {
 
-    private final ProductRepository productRepository;
-    private final OutboundOrderRepository outboundOrderRepository;
     private final OutboundOrderItemRepository outboundOrderItemRepository;
-    private final OutboundRepository outboundRepository;
-    private final OutboundOrderMapper mapper;
+    private final StockService stockService;
     private final Notifier notifier;
-    private final ExecutorService executorService = Executors.newFixedThreadPool(4);
+    private final ProductRepository productRepository;
 
-    public OutboundProcessorService(ProductRepository productRepository, OutboundOrderRepository outboundOrderRepository, OutboundOrderItemRepository outboundOrderItemRepository, OutboundRepository outboundRepository, OutboundOrderMapper mapper, @Qualifier("discordNotifier") Notifier notifier) {
-        this.productRepository = productRepository;
-        this.outboundOrderRepository = outboundOrderRepository;
+    public OutboundProcessorService(
+            OutboundOrderItemRepository outboundOrderItemRepository,
+            StockService stockService,
+            @Qualifier("discordNotifier") Notifier notifier, ProductRepository productRepository) {
         this.outboundOrderItemRepository = outboundOrderItemRepository;
-        this.outboundRepository = outboundRepository;
-        this.mapper = mapper;
+        this.stockService = stockService;
         this.notifier = notifier;
+        this.productRepository = productRepository;
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public OutboundResponseDto proccessOutbound(ProductDto productDto, Map<String, OutboundOrderItem> orderItemMap) {
+    public OutboundResponseDto processOutbound(ProductDto productDto, List<Outbound> processedOutboundList) {
         String productName = productDto.getProduct();
-        OutboundOrderItem orderItem = orderItemMap.get(productName);
-        if (orderItem == null) {
-            throw new IllegalArgumentException("출고 요청 제품이 아닙니다. : " + productName);
+//        Product product = productRepository.findByName(productName)
+//                .orElseThrow(() -> new IllegalArgumentException("제품이 존재하지 않습니다. : " + productName));
+
+        // 반드시 fresh하게 DB에서 조회
+        OutboundOrderItem orderItem = outboundOrderItemRepository.findByProduct_Name(productName)
+                .orElseThrow(() -> new IllegalArgumentException("출고 요청 아이템을 찾을 수 없습니다. : " + productName));
+
+        int outboundQuantity = productDto.getQuantity();
+        if (outboundQuantity > orderItem.getRequiredQuantity()) {
+            throw new IllegalArgumentException("출고량이 요청수량보다 많습니다. 요청수량: " + orderItem.getRequiredQuantity() + ", 출고량: " + outboundQuantity);
         }
 
-        // 재고감소(낙관적 락)
-        int quantity = productDto.getQuantity();
-        int updatedStock = updateStockWithRetry(orderItem, quantity);
+        // 재고 확인 및 출고량만큼 감소(낙관적 락 적용)
+        int updatedStock = stockService.checkAndUpdateStockWithRetry(orderItem, outboundQuantity);
+
+        // fresh한 product를 db에서 가져옴
+        Product product = productRepository.findByName(productName).orElseThrow(() -> new IllegalArgumentException("not found product : " + productName));
+
+        log.info("업데이트된 재고: {}", product.getCurrentStock());
+
+        // releasedQuantity 증가 (동기화)
+        orderItem.setReleasedQuantity(orderItem.getReleasedQuantity() + outboundQuantity);
+        Long orderItemId = orderItem.getId();
+        log.info("[증가 후] orderItemId: {}, releasedQuantity: {}", orderItemId, orderItem.getReleasedQuantity());
+
+        // 출고 요청 상태 변경 (fresh 인스턴스에서)
+        setOutboundOrderStatus(orderItem);
+        outboundOrderItemRepository.saveAndFlush(orderItem);
+
+        // 출고 엔티티 생성 및 리스트에 추가
+        Outbound outbound = new Outbound(outboundQuantity, orderItem);
+        processedOutboundList.add(outbound);
 
         // 업데이트된 재고가 임계치보다 낮으면 알람
-        Product product = orderItem.getProduct();
+//        Product product = orderItem.getProduct();
         int threshold = product.getThreshold();
-
         if (updatedStock <= threshold) {
-            notifier.notify(product.getName() + " 제품의 재고가 " + updatedStock + "개 입니다. 재고 수량을 " + threshold + "개가 넘도록 채워주세요.");
+            notifier.notify(productName + " 제품의 재고가 " + updatedStock + "개 입니다. 재고 수량을 " + threshold + "개가 넘도록 채워주세요.");
         }
 
-        // 출고한 수량 업데이트
-        int releasedQuantity = orderItem.getReleasedQuantity();
-        orderItem.setReleasedQuantity(releasedQuantity + quantity);
-
-        // 출고 상태 변경
-        setOutboundOrderStatus(orderItem);
-
-        return new OutboundResponseDto(productName, quantity, updatedStock);
-    }
-
-    private int updateStockWithRetry(OutboundOrderItem orderItem, int quantity) {
-        int maxRetries = 3;
-
-        for (int retryCount = 1; retryCount <= maxRetries; retryCount++) {
-            try {
-                int currentStock = orderItem.getProduct().getCurrentStock();
-                if (currentStock < quantity) {
-                    throw new IllegalArgumentException("재고가 부족합니다");
-                }
-                int updatedQuantity = currentStock - quantity;
-                orderItem.getProduct().setCurrentStock(updatedQuantity);
-                outboundOrderItemRepository.saveAndFlush(orderItem);
-
-                return updatedQuantity;
-            } catch (OptimisticLockException e) {
-                log.warn("낙관적 락 충돌, 재시도 {}회", retryCount);
-                if (retryCount == maxRetries) {
-                    throw new ConcurrencyFailureException("재고 업데이트 실패 (동시성 충돌)");
-                }
-                // 재시도 전 잠깐 대기 (backoff 전략)
-                try {
-                    Thread.sleep(50L * retryCount);
-                } catch (InterruptedException ignored) {
-                }
-            }
-        }
-        throw new ConcurrencyFailureException("재고 업데이트 실패");
+        return new OutboundResponseDto(productName, outboundQuantity, updatedStock);
     }
 
     private static void setOutboundOrderStatus(OutboundOrderItem orderItem) {
@@ -107,5 +89,4 @@ public class OutboundProcessorService {
             orderItem.setStatus(OrderStatus.COMPLETED.toString());
         }
     }
-
 }

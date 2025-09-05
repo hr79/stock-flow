@@ -1,9 +1,9 @@
 package com.example.stockflow.domain.outbound;
 
 import com.example.stockflow.model.BaseEntity;
-import com.example.stockflow.model.OrderStatus;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -24,7 +24,7 @@ public class Outbound extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     private OutboundOrderItem outboundOrderItem;
 
-
+    @Builder
     public Outbound(int quantity, OutboundOrderItem outboundOrderItem) {
         this.quantity = quantity;
         this.outboundOrderItem = outboundOrderItem;

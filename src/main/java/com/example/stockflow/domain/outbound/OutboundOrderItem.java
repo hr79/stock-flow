@@ -33,6 +33,9 @@ public class OutboundOrderItem {
     @Column(nullable = false)
     private String status;
 
+    @Version
+    private Long version;
+
     @Builder
     public OutboundOrderItem(OutboundOrder outboundOrder, Product product, int requiredQuantity, int releasedQuantity, String status) {
         this.outboundOrder = outboundOrder;
