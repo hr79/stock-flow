@@ -1,4 +1,4 @@
-package com.example.stockflow.domain.outbound;
+package com.example.stockflow.domain.outboundorder;
 
 
 import com.example.stockflow.domain.outbound.dto.CreateOutboundResponseDto;
@@ -9,10 +9,10 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 @Component
-public class OutboundRequestMapper {
-    public OutboundRequestItem toEntity(OutboundRequest outboundRequest, Product product, int quantity) {
-        return OutboundRequestItem.builder()
-                .outboundRequest(outboundRequest)
+public class OutboundOrderMapper {
+    public OutboundOrderItem toEntity(OutboundOrder outboundOrder, Product product, int quantity) {
+        return OutboundOrderItem.builder()
+                .outboundOrder(outboundOrder)
                 .product(product)
                 .requiredQuantity(quantity)
                 .releasedQuantity(0)

@@ -1,4 +1,4 @@
-package com.example.stockflow.domain.outbound.dto;
+package com.example.stockflow.domain.outboundorder;
 
 import com.example.stockflow.domain.product.ProductDto;
 import lombok.Getter;

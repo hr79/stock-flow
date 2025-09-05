@@ -36,4 +36,8 @@ public class Product {
         this.currentStock = currentStock;
         this.threshold = (threshold == null) ? 100 : threshold;
     }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 }
