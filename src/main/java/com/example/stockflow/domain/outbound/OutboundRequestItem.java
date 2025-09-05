@@ -9,14 +9,14 @@ import lombok.*;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 // 출고요청서 품목 상세
-public class OutboundOrderItem {
+public class OutboundRequestItem {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @JoinColumn
     @ManyToOne(fetch = FetchType.LAZY)
-    private OutboundOrder outboundOrder;
+    private OutboundRequest outboundRequest;
 
     @JoinColumn
     @ManyToOne(fetch = FetchType.LAZY)
@@ -37,8 +37,8 @@ public class OutboundOrderItem {
     private Long version;
 
     @Builder
-    public OutboundOrderItem(OutboundOrder outboundOrder, Product product, int requiredQuantity, int releasedQuantity, String status) {
-        this.outboundOrder = outboundOrder;
+    public OutboundRequestItem(OutboundRequest outboundRequest, Product product, int requiredQuantity, int releasedQuantity, String status) {
+        this.outboundRequest = outboundRequest;
         this.product = product;
         this.requiredQuantity = requiredQuantity;
         this.releasedQuantity = releasedQuantity;

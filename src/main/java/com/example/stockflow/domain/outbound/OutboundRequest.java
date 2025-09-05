@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 // 출고요청서
-public class OutboundOrder extends BaseEntity {
+public class OutboundRequest extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -24,7 +24,7 @@ public class OutboundOrder extends BaseEntity {
     private String status;
 
     @Builder
-    public OutboundOrder(String destination, String status) {
+    public OutboundRequest(String destination, String status) {
         this.destination = destination;
         this.status = (status != null) ? status : OrderStatus.REQUESTED.toString();
     }
