@@ -1,4 +1,4 @@
-package com.example.stockflow.domain.outbound;
+package com.example.stockflow.domain.outboundorder;
 
 import com.example.stockflow.model.BaseEntity;
 import com.example.stockflow.model.OrderStatus;
@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 // 출고요청서
-public class OutboundRequest extends BaseEntity {
+public class OutboundOrder extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -24,7 +24,7 @@ public class OutboundRequest extends BaseEntity {
     private String status;
 
     @Builder
-    public OutboundRequest(String destination, String status) {
+    public OutboundOrder(String destination, String status) {
         this.destination = destination;
         this.status = (status != null) ? status : OrderStatus.REQUESTED.toString();
     }

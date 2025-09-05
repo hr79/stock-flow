@@ -1,8 +1,12 @@
 package com.example.stockflow.domain.outbound;
 
-import com.example.stockflow.domain.outbound.dto.OutboundRequestDto;
-import com.example.stockflow.domain.outbound.dto.OutboundResponseDto;
+import com.example.stockflow.domain.outboundorder.OutboundRequestDto;
+import com.example.stockflow.domain.outboundorder.OutboundResponseDto;
 import com.example.stockflow.domain.outbound.service.OutboundService;
+import com.example.stockflow.domain.outboundorder.OutboundOrder;
+import com.example.stockflow.domain.outboundorder.OutboundOrderItem;
+import com.example.stockflow.domain.outboundorder.OutboundOrderItemRepository;
+import com.example.stockflow.domain.outboundorder.OutboundOrderRepository;
 import com.example.stockflow.domain.product.Product;
 import com.example.stockflow.domain.product.ProductDto;
 import com.example.stockflow.domain.product.ProductRepository;
@@ -28,7 +32,6 @@ import static org.assertj.core.api.Assertions.*;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.*;
 
 @SpringBootTest
 @Testcontainers

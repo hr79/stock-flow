@@ -1,5 +1,6 @@
 package com.example.stockflow.domain.outbound;
 
+import com.example.stockflow.domain.outboundorder.OutboundOrderItem;
 import com.example.stockflow.model.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;

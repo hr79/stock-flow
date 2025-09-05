@@ -1,6 +1,6 @@
 package com.example.stockflow.domain.product;
 
-import com.example.stockflow.domain.outbound.OutboundOrderItem;
+import com.example.stockflow.domain.outboundorder.OutboundOrderItem;
 import jakarta.persistence.OptimisticLockException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

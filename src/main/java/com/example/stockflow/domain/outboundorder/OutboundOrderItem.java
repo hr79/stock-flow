@@ -1,4 +1,4 @@
-package com.example.stockflow.domain.outbound;
+package com.example.stockflow.domain.outboundorder;
 
 import com.example.stockflow.domain.product.Product;
 import com.example.stockflow.model.OrderStatus;
@@ -9,14 +9,14 @@ import lombok.*;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 // 출고요청서 품목 상세
-public class OutboundRequestItem {
+public class OutboundOrderItem {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @JoinColumn
     @ManyToOne(fetch = FetchType.LAZY)
-    private OutboundRequest outboundRequest;
+    private OutboundOrder outboundOrder;
 
     @JoinColumn
     @ManyToOne(fetch = FetchType.LAZY)
@@ -37,8 +37,8 @@ public class OutboundRequestItem {
     private Long version;
 
     @Builder
-    public OutboundRequestItem(OutboundRequest outboundRequest, Product product, int requiredQuantity, int releasedQuantity, String status) {
-        this.outboundRequest = outboundRequest;
+    public OutboundOrderItem(OutboundOrder outboundOrder, Product product, int requiredQuantity, int releasedQuantity, String status) {
+        this.outboundOrder = outboundOrder;
         this.product = product;
         this.requiredQuantity = requiredQuantity;
         this.releasedQuantity = releasedQuantity;

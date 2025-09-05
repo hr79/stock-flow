@@ -1,7 +1,9 @@
 package com.example.stockflow.domain.outbound.service;
 
 import com.example.stockflow.domain.outbound.*;
-import com.example.stockflow.domain.outbound.dto.OutboundResponseDto;
+import com.example.stockflow.domain.outboundorder.OutboundResponseDto;
+import com.example.stockflow.domain.outboundorder.OutboundOrderItem;
+import com.example.stockflow.domain.outboundorder.OutboundOrderItemRepository;
 import com.example.stockflow.domain.product.Product;
 import com.example.stockflow.domain.product.ProductDto;
 import com.example.stockflow.domain.product.ProductRepository;
@@ -38,8 +40,6 @@ public class OutboundProcessorService {
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public OutboundResponseDto processOutbound(ProductDto productDto, List<Outbound> processedOutboundList) {
         String productName = productDto.getProduct();
-//        Product product = productRepository.findByName(productName)
-//                .orElseThrow(() -> new IllegalArgumentException("제품이 존재하지 않습니다. : " + productName));
 
         // 반드시 fresh하게 DB에서 조회
         OutboundOrderItem orderItem = outboundOrderItemRepository.findByProduct_Name(productName)
@@ -72,7 +72,6 @@ public class OutboundProcessorService {
         processedOutboundList.add(outbound);
 
         // 업데이트된 재고가 임계치보다 낮으면 알람
-//        Product product = orderItem.getProduct();
         int threshold = product.getThreshold();
         if (updatedStock <= threshold) {
             notifier.notify(productName + " 제품의 재고가 " + updatedStock + "개 입니다. 재고 수량을 " + threshold + "개가 넘도록 채워주세요.");

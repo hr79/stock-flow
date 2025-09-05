@@ -1,7 +1,11 @@
 package com.example.stockflow.domain.outbound;
 
-import com.example.stockflow.domain.outbound.dto.OutboundRequestDto;
+import com.example.stockflow.domain.outboundorder.OutboundRequestDto;
 import com.example.stockflow.domain.outbound.service.OutboundService;
+import com.example.stockflow.domain.outboundorder.OutboundOrder;
+import com.example.stockflow.domain.outboundorder.OutboundOrderItem;
+import com.example.stockflow.domain.outboundorder.OutboundOrderItemRepository;
+import com.example.stockflow.domain.outboundorder.OutboundOrderRepository;
 import com.example.stockflow.domain.product.Product;
 import com.example.stockflow.domain.product.ProductDto;
 import com.example.stockflow.domain.product.ProductRepository;
@@ -40,9 +44,10 @@ class RegisterOutboundTest {
     private ProductRepository productRepository;
 
     @Autowired
-    private OutboundRequestRepository outboundRequestRepository;
+    private OutboundOrderRepository outboundOrderRepository;
 
-    @Autowired private OutboundRequestItemRepository outboundRequestItemRepository;
+    @Autowired
+    private OutboundOrderItemRepository outboundOrderItemRepository;
 
     @Container
     static PostgreSQLContainer<?> postgres =
@@ -64,8 +69,8 @@ class RegisterOutboundTest {
     void setUp() {
         System.out.println(":::: 테스트 데이터 준비 중...");
         List<Product> products = new ArrayList<>();
-        OutboundRequest outboundRequest = new OutboundRequest("거래처", OrderStatus.REQUESTED.toString());
-        List<OutboundRequestItem> outboundRequestItemList = new ArrayList<>();
+        OutboundOrder outboundOrder = new OutboundOrder("거래처", OrderStatus.REQUESTED.toString());
+        List<OutboundOrderItem> outboundOrderItemList = new ArrayList<>();
 
         for (int i = 0; i < 10000; i++) {
 
@@ -78,18 +83,18 @@ class RegisterOutboundTest {
 
             products.add(product);
 
-            OutboundRequestItem orderItem = OutboundRequestItem.builder().
-                    outboundOrder(outboundRequest)
+            OutboundOrderItem orderItem = OutboundOrderItem.builder()
+                    .outboundOrder(outboundOrder)
                     .product(product)
                     .requiredQuantity(1)
                     .status(OrderStatus.REQUESTED.toString())
                     .build();
 
-            outboundRequestItemList.add(orderItem);
+            outboundOrderItemList.add(orderItem);
         }
         productRepository.saveAll(products);
-        outboundRequestRepository.save(outboundRequest);
-        outboundRequestItemRepository.saveAll(outboundRequestItemList);
+        outboundOrderRepository.save(outboundOrder);
+        outboundOrderItemRepository.saveAll(outboundOrderItemList);
     }
 
     private OutboundRequestDto createTestRequestDto() {
@@ -119,7 +124,7 @@ class RegisterOutboundTest {
 
         // ✅ 멀티스레드 실행
         stopWatch.start("멀티스레드 처리");
-        outboundService.fulfillOutboundRequestWithMultiThreading(requestDto); // 병렬 처리 메서드
+        outboundService.createOutboundWithMultiThreading(requestDto); // 병렬 처리 메서드
         stopWatch.stop();
 
         System.out.println("▶ 처리 시간 비교");

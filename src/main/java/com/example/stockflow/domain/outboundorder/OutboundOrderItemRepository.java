@@ -1,4 +1,4 @@
-package com.example.stockflow.domain.outbound;
+package com.example.stockflow.domain.outboundorder;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

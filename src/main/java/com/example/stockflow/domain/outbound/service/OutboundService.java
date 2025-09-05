@@ -1,10 +1,11 @@
 package com.example.stockflow.domain.outbound.service;
 
 import com.example.stockflow.domain.outbound.*;
-import com.example.stockflow.domain.outbound.dto.OutboundOrderRequestDto;
-import com.example.stockflow.domain.outbound.dto.OutboundOrderResponseDto;
-import com.example.stockflow.domain.outbound.dto.OutboundRequestDto;
-import com.example.stockflow.domain.outbound.dto.OutboundResponseDto;
+import com.example.stockflow.domain.outbound.dto.CreateOutboundRequestDto;
+import com.example.stockflow.domain.outbound.dto.CreateOutboundResponseDto;
+import com.example.stockflow.domain.outboundorder.OutboundRequestDto;
+import com.example.stockflow.domain.outboundorder.OutboundResponseDto;
+import com.example.stockflow.domain.outboundorder.*;
 import com.example.stockflow.domain.product.ProductDto;
 import com.example.stockflow.domain.product.Product;
 import com.example.stockflow.model.OrderStatus;
@@ -24,8 +25,6 @@ import java.util.concurrent.CompletionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
-
-import static java.util.stream.Collectors.toList;
 
 @Slf4j
 @Service
@@ -51,14 +50,14 @@ public class OutboundService {
 
     // 출고 요청
     @Transactional
-    public OutboundOrderResponseDto createOutboundOrder(OutboundOrderRequestDto outboundOrderRequestDto) {
-        String destination = outboundOrderRequestDto.getDestination();
+    public CreateOutboundResponseDto createOutboundOrder(CreateOutboundRequestDto createOutboundRequestDto) {
+        String destination = createOutboundRequestDto.getDestination();
         OutboundOrder outboundOrder = OutboundOrder.builder().destination(destination).build();
         outboundOrderRepository.save(outboundOrder);
 
         List<OutboundOrderItem> orderItemList = new ArrayList<>();
 
-        for (ProductDto productDto : outboundOrderRequestDto.getProducts()) {
+        for (ProductDto productDto : createOutboundRequestDto.getProducts()) {
             String productName = productDto.getProduct();
             Product product = productRepository.findByName(productName).orElseThrow(() -> new IllegalArgumentException("not found product : " + productName));
             int quantity = productDto.getQuantity();
@@ -74,7 +73,7 @@ public class OutboundService {
         }
         outboundOrderItemRepository.saveAll(orderItemList);
 
-        return mapper.toDto(outboundOrder.getId(), outboundOrderRequestDto.getProducts(), destination);
+        return mapper.toDto(outboundOrder.getId(), createOutboundRequestDto.getProducts(), destination);
     }
 
     // 출고 등록
@@ -159,8 +158,6 @@ public class OutboundService {
 
     // 출고 등록 & 처리(멀티스레딩 적용)
     public List<OutboundResponseDto> createOutboundWithMultiThreading(OutboundRequestDto outboundRequestDto) {
-//        Map<String, OutboundOrderItem> orderItemMap = getOutboundOrderItemMapForMultiThreading(outboundRequestDto.getOutboundId());
-
         // Thread-safe 리스트 사용
         List<Outbound> completedOutboundList = Collections.synchronizedList(new ArrayList<>());
         List<OutboundResponseDto> results = new ArrayList<>();
@@ -207,14 +204,5 @@ public class OutboundService {
         }
 
         return results;
-    }
-
-    private Map<String, OutboundOrderItem> getOutboundOrderItemMapForMultiThreading(Long outboundOrderId) {
-        List<OutboundOrderItem> outboundOrderItemList = outboundOrderItemRepository.findOutboundOrderItemsWithProductByOutboundOrderId(outboundOrderId);
-
-        return outboundOrderItemList.stream().collect(Collectors.toMap(
-                outboundOrderItem -> outboundOrderItem.getProduct().getName(),
-                outboundOrderItem -> outboundOrderItem
-        ));
     }
 }
