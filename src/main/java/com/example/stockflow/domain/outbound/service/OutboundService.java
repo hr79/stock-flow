@@ -11,6 +11,7 @@ import com.example.stockflow.domain.product.Product;
 import com.example.stockflow.model.OrderStatus;
 import com.example.stockflow.notification.Notifier;
 import com.example.stockflow.domain.product.ProductRepository;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -26,55 +27,19 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
+@RequiredArgsConstructor
 @Slf4j
 @Service
 public class OutboundService {
-    private final ProductRepository productRepository;
-    private final OutboundOrderRepository outboundOrderRepository;
+
     private final OutboundOrderItemRepository outboundOrderItemRepository;
     private final OutboundRepository outboundRepository;
     private final OutboundOrderMapper mapper;
-    private final Notifier notifier;
+    private final @Qualifier("discordNotifier") Notifier notifier;
     private final ExecutorService executorService = Executors.newFixedThreadPool(8);
     private final OutboundProcessorService outboundProcessorService;
 
-    public OutboundService(ProductRepository productRepository, OutboundOrderRepository outboundOrderRepository, OutboundOrderItemRepository outboundOrderItemRepository, OutboundRepository outboundRepository, OutboundOrderMapper mapper, @Qualifier("discordNotifier") Notifier notifier, OutboundProcessorService outboundProcessorService) {
-        this.productRepository = productRepository;
-        this.outboundOrderRepository = outboundOrderRepository;
-        this.outboundOrderItemRepository = outboundOrderItemRepository;
-        this.outboundRepository = outboundRepository;
-        this.mapper = mapper;
-        this.notifier = notifier;
-        this.outboundProcessorService = outboundProcessorService;
-    }
 
-    // 출고 요청
-    @Transactional
-    public CreateOutboundResponseDto createOutboundOrder(CreateOutboundRequestDto createOutboundRequestDto) {
-        String destination = createOutboundRequestDto.getDestination();
-        OutboundOrder outboundOrder = OutboundOrder.builder().destination(destination).build();
-        outboundOrderRepository.save(outboundOrder);
-
-        List<OutboundOrderItem> orderItemList = new ArrayList<>();
-
-        for (ProductDto productDto : createOutboundRequestDto.getProducts()) {
-            String productName = productDto.getProduct();
-            Product product = productRepository.findByName(productName).orElseThrow(() -> new IllegalArgumentException("not found product : " + productName));
-            int quantity = productDto.getQuantity();
-
-            // 출고 요청 수량이 현재 재고보다 많으면 외부 알림(ex. discord 등)
-            if (quantity > product.getCurrentStock()) {
-                notifier.notify(productName + " 제품이 " + (quantity - product.getCurrentStock()) + "개 입고가 필요합니다.");
-            }
-
-            OutboundOrderItem orderItem = mapper.toEntity(outboundOrder, product, quantity);
-
-            orderItemList.add(orderItem);
-        }
-        outboundOrderItemRepository.saveAll(orderItemList);
-
-        return mapper.toDto(outboundOrder.getId(), createOutboundRequestDto.getProducts(), destination);
-    }
 
     // 출고 등록
     @Transactional

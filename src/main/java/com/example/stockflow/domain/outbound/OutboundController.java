@@ -21,14 +21,7 @@ import java.util.List;
 public class OutboundController {
     private final OutboundService outboundService;
 
-    // 출고 요청
-    @Operation(summary = "출고 요청")
-    @PostMapping("/outbound-request")
-    public ApiResponse<?> createOutboundRequest(@RequestBody CreateOutboundRequestDto requestDto) {
-        CreateOutboundResponseDto responseDto = outboundService.createOutboundOrder(requestDto);
 
-        return ApiResponse.success("/outbound-request", responseDto);
-    }
 
     // 출고 등록
     @Operation(summary = "출고 등록")
