@@ -20,27 +20,23 @@ public class StockUpdater {
         // 재고 수량 업데이트 로직 구현
         Product product = orderItem.getProduct();
 
-        log.info(":::: 현재 제품 재고: {}", product.getCurrentStock());
+        int currentStock = product.getCurrentStock();
+        log.info(":::: 현재 제품 재고: {}", currentStock);
 
-            // 재고 수량 증가
-            int increasedStock = product.increase(quantity);
-            productRepository.save(product);
-            log.info(":::: 증가한 재고 수량: {}", increasedStock);
+        // 재고 수량 증가
+        currentStock = product.increase(quantity);
+        productRepository.save(product);
+        log.info(":::: 증가한 재고 수량: {}", currentStock);
 
-            // 입고된 수량 기록
-            log.info(":::: before 받은수량: {}", orderItem.getReceivedQuantity());
-            int updatedReceivedQuantity = orderItem.increaseReceivedQuantity(quantity);
-            log.info(":::: after 받은수량: {}", updatedReceivedQuantity);
+        // 입고된 수량 기록
+        int currentReceivedQuantity = orderItem.getReceivedQuantity();
+        log.info(":::: before 받은수량: {}", currentReceivedQuantity);
+        currentReceivedQuantity = orderItem.increaseReceivedQuantity(quantity);
+        log.info(":::: after 받은수량: {}", currentReceivedQuantity);
 
-            if (updatedReceivedQuantity < orderItem.getRequiredQuantity()) {
-                // 입고된 수량이 요청 수량보다 아직 적으면 발주 in progress 상태
-                orderItem.changeStatus(OrderStatus.IN_PROGRESS.toString());
-            } else {
-                // 입고 수량이 요청한 수량을 채우고 그 이상이면 발주 completed 상태
-                orderItem.changeStatus(OrderStatus.COMPLETED.toString());
-            }
-            purchaseOrderItemRepository.save(orderItem);
+        orderItem.applyStatus();
+        purchaseOrderItemRepository.save(orderItem);
 
-            return increasedStock;
+        return currentStock;
     }
 }

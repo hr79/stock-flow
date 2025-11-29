@@ -19,10 +19,10 @@ public class OutboundOrderController {
 
     // 출고 요청
     @Operation(summary = "출고 요청")
-    @PostMapping("/outbound-request")
+    @PostMapping
     public ApiResponse<?> createOutboundRequest(@RequestBody CreateOutboundRequestDto requestDto) {
         CreateOutboundResponseDto responseDto = outboundOrderService.createOutboundOrder(requestDto);
 
-        return ApiResponse.success("/outbound-request", responseDto);
+        return ApiResponse.success("/outbound-orders", responseDto);
     }
 }

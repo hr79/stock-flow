@@ -34,7 +34,7 @@ public class OutboundStockUpdater {
         orderItem.increaseReleasedQuantity(quantity);
 
         // 출고 요청 상태 변경
-        changeOutboundOrderStatus(orderItem);
+        orderItem.applyStatus();
 
         return currentStock;
     }
@@ -42,14 +42,5 @@ public class OutboundStockUpdater {
     private void notifyThreshold(int currentStock, int requiredStock, Product product) {
         String message = product.getName() + " 제품의 재고가 " + currentStock + "개 입니다. 재고 수량을 " + requiredStock + "개가 넘도록 채워주세요.";
         notifier.notify(message);
-    }
-
-    private static void changeOutboundOrderStatus(OutboundOrderItem orderItem) {
-        if (orderItem.getReleasedQuantity() < orderItem.getRequiredQuantity()) {
-            orderItem.changeStatus(OrderStatus.IN_PROGRESS.toString());
-        }
-        if (orderItem.getReleasedQuantity() >= orderItem.getRequiredQuantity()) {
-            orderItem.changeStatus(OrderStatus.COMPLETED.toString());
-        }
     }
 }

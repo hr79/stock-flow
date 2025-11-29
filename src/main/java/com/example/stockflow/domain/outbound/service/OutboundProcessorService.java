@@ -59,12 +59,14 @@ public class OutboundProcessorService {
         log.info("업데이트된 재고: {}", product.getCurrentStock());
 
         // releasedQuantity 증가 (동기화)
-        orderItem.setReleasedQuantity(orderItem.getReleasedQuantity() + outboundQuantity);
+        int releasedQuantity = orderItem.increaseReleasedQuantity(outboundQuantity);
+
         Long orderItemId = orderItem.getId();
-        log.info("[증가 후] orderItemId: {}, releasedQuantity: {}", orderItemId, orderItem.getReleasedQuantity());
+        log.info("[증가 후] orderItemId: {}, releasedQuantity: {}", orderItemId, releasedQuantity);
 
         // 출고 요청 상태 변경 (fresh 인스턴스에서)
-        setOutboundOrderStatus(orderItem);
+        orderItem.applyStatus();
+//        setOutboundOrderStatus(orderItem);
         outboundOrderItemRepository.saveAndFlush(orderItem);
 
         // 출고 엔티티 생성 및 리스트에 추가
@@ -80,12 +82,12 @@ public class OutboundProcessorService {
         return new OutboundResponseDto(productName, outboundQuantity, updatedStock);
     }
 
-    private static void setOutboundOrderStatus(OutboundOrderItem orderItem) {
-        if (orderItem.getReleasedQuantity() < orderItem.getRequiredQuantity()) {
-            orderItem.setStatus(OrderStatus.IN_PROGRESS.toString());
-        }
-        if (orderItem.getReleasedQuantity() >= orderItem.getRequiredQuantity()) {
-            orderItem.setStatus(OrderStatus.COMPLETED.toString());
-        }
-    }
+//    private static void setOutboundOrderStatus(OutboundOrderItem orderItem) {
+//        if (orderItem.getReleasedQuantity() < orderItem.getRequiredQuantity()) {
+//            orderItem.setStatus(OrderStatus.IN_PROGRESS.toString());
+//        }
+//        if (orderItem.getReleasedQuantity() >= orderItem.getRequiredQuantity()) {
+//            orderItem.setStatus(OrderStatus.COMPLETED.toString());
+//        }
+//    }
 }
