@@ -19,7 +19,6 @@ public class Product {
     @Column
     private BigDecimal price;
 
-    @Setter
     @Column
     private int currentStock;
 
@@ -39,5 +38,15 @@ public class Product {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public int increase(int quantity) {
+        this.currentStock += quantity;
+        return this.currentStock;
+    }
+
+    public int decrease(int quantity) {
+      this.currentStock -= quantity;
+      return this.currentStock;
     }
 }

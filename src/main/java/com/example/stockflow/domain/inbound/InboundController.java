@@ -14,13 +14,13 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 public class InboundController {
-    private final InboundService inboundService;
+    private final PurchaseOrderInboundService purchaseOrderInboundService;
 
     // 입고 등록
     @Operation(summary = "입고 등록")
     @PostMapping("/warehousing")
     public ApiResponse<?> registerWarehousing(@RequestBody InboundRequestDto requestDto) {
-        List<InboundResponseDto> responseDtoList = inboundService.registerWarehousing(requestDto);
+        List<InboundResponseDto> responseDtoList = purchaseOrderInboundService.registerInbound(requestDto);
         return ApiResponse.success("/warehousing", responseDtoList);
     }
 }
