@@ -25,11 +25,9 @@ public class OutboundOrderItem {
     @Column(nullable = false)
     private int requiredQuantity;
 
-    @Setter
     @Column(nullable = false)
     private int releasedQuantity;
 
-    @Setter
     @Column(nullable = false)
     private String status;
 
@@ -43,5 +41,14 @@ public class OutboundOrderItem {
         this.requiredQuantity = requiredQuantity;
         this.releasedQuantity = releasedQuantity;
         this.status = (status != null) ? status : OrderStatus.REQUESTED.toString();
+    }
+
+    public int increaseReleasedQuantity(int quantity){
+        this.releasedQuantity += quantity;
+        return this.releasedQuantity;
+    }
+
+    public void changeStatus(String status){
+        this.status = status;
     }
 }

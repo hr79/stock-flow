@@ -33,7 +33,6 @@ public class PurchaseOrderItem extends BaseEntity {
     @Column(nullable = false)
     private BigDecimal totalPrice;
 
-    @Setter
     @Column(nullable = false)
     private String status;
 
