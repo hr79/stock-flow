@@ -42,8 +42,7 @@ public class StockService {
                     throw new IllegalArgumentException("출고량이 현재 재고보다 많습니다. 현재 재고: " + currentStock + ", 출고량: " + outboundQuantity);
                 }
 
-                int updatedStock = currentStock - outboundQuantity;
-                product.setCurrentStock(updatedStock);
+                int updatedStock = product.decrease(outboundQuantity);
                 productRepository.saveAndFlush(product);
 
                 return updatedStock;

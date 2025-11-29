@@ -24,11 +24,9 @@ public class PurchaseOrderItem extends BaseEntity {
     @JoinColumn
     private Product product;
 
-    @Setter
     @Column(nullable = false)
     private int requiredQuantity;
 
-    @Setter
     @Column(nullable = false)
     private int receivedQuantity;
 
@@ -47,5 +45,19 @@ public class PurchaseOrderItem extends BaseEntity {
         this.receivedQuantity = receivedQuantity;
         this.totalPrice = totalPrice;
         this.status = (status == null) ? OrderStatus.REQUESTED.toString() : status;
+    }
+
+    public int increaseReceivedQuantity(int quantity){
+        this.receivedQuantity += quantity;
+        return this.receivedQuantity;
+    }
+
+    public void changeStatus(String status){
+        this.status = status;
+    }
+
+    public int setRequiredQuantity(int quantity) {
+        this.requiredQuantity = quantity;
+        return this.requiredQuantity;
     }
 }
