@@ -25,12 +25,15 @@ public class InboundRequestValidator {
                 .orElseThrow(() -> new IllegalArgumentException("not found supplier"));
 
         log.info(":::: 발주 아이템 목록 가져오기");
-        List<PurchaseOrderItem> purchaseOrderItems = purchaseOrderItemRepository.findAllByPurchaseOrderId(inboundRequestDto.getPurchaseOrderId()).orElseThrow(() -> new IllegalArgumentException("Purchase Order Not Found"));
+        List<PurchaseOrderItem> purchaseOrderItems = purchaseOrderItemRepository.findAllByPurchaseOrderId(inboundRequestDto.getPurchaseOrderId())
+                .orElseThrow(() -> new IllegalArgumentException("Purchase Order Not Found"));
 
-        return new ResultData(supplier, purchaseOrderItems);
+        Map<String, PurchaseOrderItem> orderItemMap = listToMap(purchaseOrderItems);
+
+        return new ResultData(supplier, orderItemMap);
     }
 
-    public Map<String, PurchaseOrderItem> listToMap(List<PurchaseOrderItem> purchaseOrderItems) {
+    private Map<String, PurchaseOrderItem> listToMap(List<PurchaseOrderItem> purchaseOrderItems) {
         Map<String, PurchaseOrderItem> orderItemMap = new ConcurrentHashMap<>();
         for (PurchaseOrderItem purchaseOrderItem : purchaseOrderItems) {
             // key: product name, value: purchaseOrderItem
@@ -40,5 +43,5 @@ public class InboundRequestValidator {
         return orderItemMap;
     }
 
-    public record ResultData(Supplier supplier, List<PurchaseOrderItem> purchaseOrderItems) { }
+    public record ResultData(Supplier supplier, Map<String, PurchaseOrderItem> purchaseOrderItems) { }
 }

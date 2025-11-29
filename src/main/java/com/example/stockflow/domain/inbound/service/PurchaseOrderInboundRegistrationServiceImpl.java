@@ -28,9 +28,7 @@ public class PurchaseOrderInboundRegistrationServiceImpl implements PurchaseOrde
 
         ResultData results = inboundRequestValidator.getSupplierAndOrderItems(inboundRequestDto);
         Supplier supplier = results.supplier();
-        List<PurchaseOrderItem> purchaseOrderItems = results.purchaseOrderItems();
-
-        Map<String, PurchaseOrderItem> orderItemMap = inboundRequestValidator.listToMap(purchaseOrderItems);
+        Map<String, PurchaseOrderItem> orderItemMap = results.purchaseOrderItems();
 
         return inboundCreator.createInbound(inboundProducts, orderItemMap, supplier);
     }
