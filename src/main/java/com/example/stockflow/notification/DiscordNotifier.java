@@ -1,6 +1,7 @@
 package com.example.stockflow.notification;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
@@ -10,6 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Component("discordNotifier")
+@Qualifier("discordNotifier")
 @Slf4j
 public class DiscordNotifier implements Notifier {
     @Value("${notifier.discord}") private String WEBHOOK_URL;

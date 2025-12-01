@@ -25,23 +25,40 @@ public class OutboundOrderItem {
     @Column(nullable = false)
     private int requiredQuantity;
 
-    @Setter
     @Column(nullable = false)
     private int releasedQuantity;
 
-    @Setter
     @Column(nullable = false)
-    private String status;
+    private OrderStatus status;
 
     @Version
     private Long version;
 
     @Builder
-    public OutboundOrderItem(OutboundOrder outboundOrder, Product product, int requiredQuantity, int releasedQuantity, String status) {
+    public OutboundOrderItem(OutboundOrder outboundOrder, Product product, int requiredQuantity, int releasedQuantity, OrderStatus status) {
         this.outboundOrder = outboundOrder;
         this.product = product;
         this.requiredQuantity = requiredQuantity;
         this.releasedQuantity = releasedQuantity;
-        this.status = (status != null) ? status : OrderStatus.REQUESTED.toString();
+        this.status = (status != null) ? status : OrderStatus.REQUESTED;
+    }
+
+    public int increaseReleasedQuantity(int quantity){
+        this.releasedQuantity += quantity;
+        return this.releasedQuantity;
+    }
+
+    public void changeStatus(OrderStatus status){
+        this.status = status;
+    }
+
+    public OrderStatus applyStatus() {
+        if (this.releasedQuantity == 0) {
+            return this.status = OrderStatus.REQUESTED;
+        } else if (this.releasedQuantity >= this.requiredQuantity) {
+            return this.status = OrderStatus.COMPLETED;
+        } else {
+            return this.status = OrderStatus.IN_PROGRESS;
+        }
     }
 }

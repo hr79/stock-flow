@@ -33,18 +33,17 @@ public class PurchaseOrderItem extends BaseEntity {
     @Column(nullable = false)
     private BigDecimal totalPrice;
 
-    @Setter
     @Column(nullable = false)
-    private String status;
+    private OrderStatus status;
 
     @Builder
-    public PurchaseOrderItem(PurchaseOrder purchaseOrder, Product product, int requiredQuantity, int receivedQuantity, BigDecimal totalPrice, String status) {
+    public PurchaseOrderItem(PurchaseOrder purchaseOrder, Product product, int requiredQuantity, int receivedQuantity, BigDecimal totalPrice, OrderStatus status) {
         this.purchaseOrder = purchaseOrder;
         this.product = product;
         this.requiredQuantity = requiredQuantity;
         this.receivedQuantity = receivedQuantity;
         this.totalPrice = totalPrice;
-        this.status = (status == null) ? OrderStatus.REQUESTED.toString() : status;
+        this.status = (status == null) ? OrderStatus.REQUESTED : status;
     }
 
     public int increaseReceivedQuantity(int quantity){
@@ -52,12 +51,22 @@ public class PurchaseOrderItem extends BaseEntity {
         return this.receivedQuantity;
     }
 
-    public void changeStatus(String status){
+    public void changeStatus(OrderStatus status){
         this.status = status;
     }
 
     public int setRequiredQuantity(int quantity) {
         this.requiredQuantity = quantity;
         return this.requiredQuantity;
+    }
+
+    public OrderStatus applyStatus() {
+        if (this.receivedQuantity == 0) {
+            return this.status = OrderStatus.REQUESTED;
+        } else if (this.receivedQuantity >= this.requiredQuantity) {
+            return this.status = OrderStatus.COMPLETED;
+        } else {
+            return this.status = OrderStatus.IN_PROGRESS;
+        }
     }
 }

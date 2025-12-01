@@ -27,20 +27,8 @@ public class PurchaseOrderQueryServiceImpl implements PurchaseOrderQueryService 
             List<PurchaseOrderItem> purchaseOrderItems = purchaseOrderItemRepository.findAllByPurchaseOrderId(purchaseOrder.getId())
                     .orElseThrow(() -> new IllegalArgumentException("Purchase Order Not Found"));
 
-            List<ItemDto> orderItems = new ArrayList<>();
-
-            for (PurchaseOrderItem orderItem : purchaseOrderItems) {
-                ItemDto itemDto = ItemDto.builder()
-                        .productName(orderItem.getProduct().getName())
-                        .currentStock(orderItem.getProduct().getCurrentStock())
-                        .requiredQuantity(orderItem.getRequiredQuantity())
-                        .receivedQuantity(orderItem.getReceivedQuantity())
-                        .status(orderItem.getStatus())
-                        .build();
-
-                orderItems.add(itemDto);
-            }
-            responseDtos.add(new PurchaseOrderDetailResponseDto(purchaseOrder.getId(), orderItems, purchaseOrder.getCreatedAt().toString()));
+            List<ItemDto> itemDtoList = orderItemListToDtoList(purchaseOrderItems);
+            responseDtos.add(new PurchaseOrderDetailResponseDto(purchaseOrder.getId(), itemDtoList, purchaseOrder.getCreatedAt().toString()));
         }
 
         return responseDtos;
@@ -51,6 +39,12 @@ public class PurchaseOrderQueryServiceImpl implements PurchaseOrderQueryService 
         Long purchaseOrderId = Long.parseLong(id);
         PurchaseOrder purchaseOrder = purchaseOrderRepository.findById(purchaseOrderId).orElseThrow(() -> new IllegalArgumentException("발주를 찾을 수 없습니다."));
         List<PurchaseOrderItem> purchaseOrderItemList = purchaseOrderItemRepository.findAllByPurchaseOrderId(purchaseOrderId).orElseThrow(() -> new IllegalArgumentException("상세 발주 물품들을 찾을 수 없습니다"));
+        List<ItemDto> itemDtoList = orderItemListToDtoList(purchaseOrderItemList);
+
+        return new PurchaseOrderDetailResponseDto(purchaseOrderId, itemDtoList, purchaseOrder.getCreatedAt().toString());
+    }
+
+    private List<ItemDto> orderItemListToDtoList(List<PurchaseOrderItem> purchaseOrderItemList) {
         List<ItemDto> itemDtoList = new ArrayList<>();
 
         for (PurchaseOrderItem orderItem : purchaseOrderItemList) {
@@ -59,11 +53,10 @@ public class PurchaseOrderQueryServiceImpl implements PurchaseOrderQueryService 
                     .currentStock(orderItem.getProduct().getCurrentStock())
                     .requiredQuantity(orderItem.getRequiredQuantity())
                     .receivedQuantity(orderItem.getReceivedQuantity())
-                    .status(orderItem.getStatus())
+                    .status(orderItem.getStatus().toString())
                     .build();
             itemDtoList.add(itemDto);
         }
-
-        return new PurchaseOrderDetailResponseDto(purchaseOrderId, itemDtoList, purchaseOrder.getCreatedAt().toString());
+        return itemDtoList;
     }
 }

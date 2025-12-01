@@ -36,17 +36,18 @@ public class Product {
         this.threshold = (threshold == null) ? 100 : threshold;
     }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
     public int increase(int quantity) {
         this.currentStock += quantity;
         return this.currentStock;
     }
 
     public int decrease(int quantity) {
-      this.currentStock -= quantity;
-      return this.currentStock;
+        if (quantity > this.currentStock) throw new IllegalArgumentException("재고가 부족합니다.");
+        this.currentStock -= quantity;
+        return this.currentStock;
+    }
+
+    public boolean isBelowThreshold() {
+        return this.currentStock <= this.threshold;
     }
 }
