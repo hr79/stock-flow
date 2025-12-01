@@ -29,6 +29,5 @@ public class Outbound extends BaseEntity {
     public Outbound(int quantity, OutboundOrderItem outboundOrderItem) {
         this.quantity = quantity;
         this.outboundOrderItem = outboundOrderItem;
-
     }
 }
