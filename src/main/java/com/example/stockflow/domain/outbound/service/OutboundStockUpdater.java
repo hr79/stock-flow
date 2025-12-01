@@ -2,7 +2,6 @@ package com.example.stockflow.domain.outbound.service;
 
 import com.example.stockflow.domain.outboundorder.OutboundOrderItem;
 import com.example.stockflow.domain.product.Product;
-import com.example.stockflow.model.OrderStatus;
 import com.example.stockflow.notification.Notifier;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
