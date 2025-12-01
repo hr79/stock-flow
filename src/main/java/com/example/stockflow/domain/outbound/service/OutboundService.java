@@ -8,7 +8,6 @@ import com.example.stockflow.domain.outboundorder.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -19,7 +18,6 @@ public class OutboundService {
     private final OutboundCreationService outboundCreationService;
 
     // 출고 등록
-    @Transactional
     public List<OutboundResponseDto> createOutbound(OutboundRequestDto outboundRequestDto) {
         return outboundCreationService.createOutbound(outboundRequestDto);
     }
