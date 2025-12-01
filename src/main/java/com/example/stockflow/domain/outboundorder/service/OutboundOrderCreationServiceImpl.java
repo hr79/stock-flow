@@ -11,14 +11,12 @@ import com.example.stockflow.notification.Notifier;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Service
-@Component
 @RequiredArgsConstructor
 @Slf4j
 public class OutboundOrderCreationServiceImpl implements OutboundOrderCreationService {
@@ -34,7 +32,8 @@ public class OutboundOrderCreationServiceImpl implements OutboundOrderCreationSe
 
         List<OutboundOrderItem> orderItemList = new ArrayList<>();
 
-        for (ProductDto productDto : createOutboundRequestDto.getProducts()) {
+        List<ProductDto> requestProducts = createOutboundRequestDto.getProducts();
+        for (ProductDto productDto : requestProducts) {
             String productName = productDto.getProduct();
             Product product = productRepository.findByName(productName).orElseThrow(() -> new IllegalArgumentException("not found product : " + productName));
             int quantity = productDto.getQuantity();
@@ -51,7 +50,7 @@ public class OutboundOrderCreationServiceImpl implements OutboundOrderCreationSe
         outboundOrderRepository.save(outboundOrder);
         outboundOrderItemRepository.saveAll(orderItemList);
 
-        return mapper.toDto(outboundOrder.getId(), createOutboundRequestDto.getProducts(), destination);
+        return new CreateOutboundResponseDto(outboundOrder.getId(), destination, requestProducts);
     }
 
 }
