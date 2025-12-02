@@ -25,7 +25,8 @@ public class OutboundCreationServiceImpl implements OutboundCreationService{
         // 출고 요청 제품들 가져와서 map
         List<OutboundOrderItem> outboundOrderItemList = outboundOrderItemRepository.findByOutboundOrderId(outboundRequestDto.getOutboundId());
 
-        Map<String, OutboundOrderItem> orderItemMap = outboundOrderItemList.stream().collect(Collectors.toConcurrentMap(
+        Map<String, OutboundOrderItem> orderItemMap = outboundOrderItemList.stream()
+                .collect(Collectors.toConcurrentMap(
                 outboundOrderItem -> outboundOrderItem.getProduct().getName(),
                 outboundOrderItem -> outboundOrderItem
         ));

@@ -28,10 +28,10 @@ public class PurchaseOrderItem extends BaseEntity {
     private int requiredQuantity;
 
     @Column(nullable = false)
-    private int receivedQuantity;
+    private int receivedQuantity = 0;
 
     @Column(nullable = false)
-    private BigDecimal totalPrice;
+    private BigDecimal totalPrice = BigDecimal.ZERO;
 
     @Column(nullable = false)
     private OrderStatus status;
@@ -46,18 +46,22 @@ public class PurchaseOrderItem extends BaseEntity {
         this.status = (status == null) ? OrderStatus.REQUESTED : status;
     }
 
-    public int increaseReceivedQuantity(int quantity){
+    public int increaseReceivedQuantity(int quantity) {
         this.receivedQuantity += quantity;
         return this.receivedQuantity;
     }
 
-    public void changeStatus(OrderStatus status){
+    public void changeStatus(OrderStatus status) {
         this.status = status;
     }
 
     public int setRequiredQuantity(int quantity) {
         this.requiredQuantity = quantity;
         return this.requiredQuantity;
+    }
+
+    public void increaseRequiredQuantity(int quantity) {
+        this.requiredQuantity += quantity;
     }
 
     public OrderStatus applyStatus() {
@@ -68,5 +72,14 @@ public class PurchaseOrderItem extends BaseEntity {
         } else {
             return this.status = OrderStatus.IN_PROGRESS;
         }
+    }
+
+    public BigDecimal calculateTotalPrice() {
+        return this.totalPrice = this.product.getPrice().multiply(BigDecimal.valueOf((this.requiredQuantity)));
+    }
+
+    public void addQuantity(int quantity){
+        increaseRequiredQuantity(quantity);
+        calculateTotalPrice();
     }
 }
