@@ -34,7 +34,7 @@ public class PurchaseOrderItem extends BaseEntity {
     private BigDecimal totalPrice = BigDecimal.ZERO;
 
     @Column(nullable = false)
-    private OrderStatus status;
+    private OrderStatus status = OrderStatus.REQUESTED;
 
     @Builder
     public PurchaseOrderItem(PurchaseOrder purchaseOrder, Product product, int requiredQuantity, int receivedQuantity, BigDecimal totalPrice, OrderStatus status) {
@@ -55,8 +55,9 @@ public class PurchaseOrderItem extends BaseEntity {
         this.status = status;
     }
 
-    public int setRequiredQuantity(int quantity) {
-        this.requiredQuantity = quantity;
+    public int setRequiredQuantity(int requiredQuantity) {
+        this.requiredQuantity = requiredQuantity;
+        calculateTotalPrice();
         return this.requiredQuantity;
     }
 
