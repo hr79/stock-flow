@@ -2,9 +2,7 @@ package com.example.stockflow.domain.inbound.service;
 
 import com.example.stockflow.domain.inbound.Inbound;
 import com.example.stockflow.domain.inbound.InboundRepository;
-import com.example.stockflow.domain.inbound.InboundRequestDto;
 import com.example.stockflow.domain.inbound.InboundResponseDto;
-import com.example.stockflow.domain.product.Product;
 import com.example.stockflow.domain.product.ProductDto;
 import com.example.stockflow.domain.purchaseorder.PurchaseOrderItem;
 import com.example.stockflow.domain.supplier.Supplier;
@@ -22,7 +20,6 @@ import java.util.Map;
 public class InboundCreator {
 
     private final InboundRepository inboundRepository;
-    private final StockUpdater stockUpdater;
 
     public List<InboundResponseDto> createInbound(List<ProductDto> inboundProducts, Map<String, PurchaseOrderItem> orderItemMap, Supplier supplier) {
         List<InboundResponseDto> inboundOrders = new ArrayList<>();
@@ -37,12 +34,10 @@ public class InboundCreator {
             if (orderItem != null) {
                 log.info(":::: 발주 신청한 상품 맞음");
                 // 입고 기록 저장
-                Inbound inbound = new Inbound(quantity, orderItem, supplier);
+                Inbound inbound = orderItem.createInbound(quantity, supplier);
                 inbounds.add(inbound);
 
-                // 발주에 대한 수량 업데이트
-                // updatedStock: 업데이트된 재고 수량
-                int updatedStock = stockUpdater.updateCurrentStock(orderItem, quantity);
+                int updatedStock = orderItem.getReceivedQuantity();
 
                 inboundOrders.add(new InboundResponseDto(productName, quantity, updatedStock, supplier.getSupplierName()));
             } else {

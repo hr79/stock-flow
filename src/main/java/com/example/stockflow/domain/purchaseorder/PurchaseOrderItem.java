@@ -1,5 +1,7 @@
 package com.example.stockflow.domain.purchaseorder;
 
+import com.example.stockflow.domain.inbound.Inbound;
+import com.example.stockflow.domain.supplier.Supplier;
 import com.example.stockflow.model.BaseEntity;
 import com.example.stockflow.model.OrderStatus;
 import com.example.stockflow.domain.product.Product;
@@ -82,5 +84,14 @@ public class PurchaseOrderItem extends BaseEntity {
     public void addQuantity(int quantity){
         increaseRequiredQuantity(quantity);
         calculateTotalPrice();
+    }
+
+    public Inbound createInbound(int receivedQuantity, Supplier supplier) {
+        Inbound inbound = new Inbound(receivedQuantity, this, supplier);
+        increaseReceivedQuantity(receivedQuantity);
+        this.product.increase(receivedQuantity);
+        applyStatus();
+
+        return inbound;
     }
 }
