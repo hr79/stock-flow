@@ -28,7 +28,10 @@ public class PurchaseOrderQueryServiceImpl implements PurchaseOrderQueryService 
                     .orElseThrow(() -> new IllegalArgumentException("Purchase Order Not Found"));
 
             List<ItemDto> itemDtoList = orderItemListToDtoList(purchaseOrderItems);
-            responseDtos.add(new PurchaseOrderDetailResponseDto(purchaseOrder.getId(), itemDtoList, purchaseOrder.getCreatedAt().toString()));
+            responseDtos.add(new PurchaseOrderDetailResponseDto(
+                    purchaseOrder.getId(),
+                    itemDtoList,
+                    purchaseOrder.getCreatedAt().toString()));
         }
 
         return responseDtos;

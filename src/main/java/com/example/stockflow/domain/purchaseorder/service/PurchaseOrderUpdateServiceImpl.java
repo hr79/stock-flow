@@ -7,7 +7,6 @@ import com.example.stockflow.domain.purchaseorder.dto.ItemDto;
 import com.example.stockflow.domain.purchaseorder.service.PurchaseOrderServiceInterface.PurchaseOrderUpdateService;
 import com.example.stockflow.domain.purchaseorder.dto.PurchaseOrderDetailResponseDto;
 import com.example.stockflow.domain.purchaseorder.dto.PurchaseOrderRequestDto;
-import com.example.stockflow.model.OrderStatus;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -22,6 +21,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class PurchaseOrderUpdateServiceImpl implements PurchaseOrderUpdateService {
     private final PurchaseOrderItemRepository purchaseOrderItemRepository;
+    private final ItemUpdateProcessor itemUpdateProcessor;
 
     @Override
     public PurchaseOrderDetailResponseDto updatePurchaseOrder(String id, PurchaseOrderRequestDto requestDto) {
@@ -42,29 +42,14 @@ public class PurchaseOrderUpdateServiceImpl implements PurchaseOrderUpdateServic
                 ));
 
         for (ProductDto product : products) {
-            PurchaseOrderItem orderItem = orderItemMap.get(product.getProduct());
-
-            if (orderItem == null) {
-                throw new IllegalArgumentException("없는 발주 상품입니다.");
-            }
-
-            // 발주 진행 상황이 request 상태이면 발주 변경
-            if (orderItem.getStatus().equals(OrderStatus.REQUESTED.toString())) {
-                log.info(":::: 발주가 대기 상태입니다.");
-                log.info("before : {}", orderItem.getRequiredQuantity());
-
-                int requiredQuantity = orderItem.setRequiredQuantity(product.getQuantity());
-
-                log.info("after : {}", requiredQuantity);
-
-                ItemDto itemDto = ItemDto.builder()
-                        .productName(product.getProduct())
-                        .requiredQuantity(requiredQuantity)
-                        .build();
-
-                itemDtoList.add(itemDto);
-            }
+            ItemDto itemDto = itemUpdateProcessor.process(orderItemMap, product);
+            itemDtoList.add(itemDto);
         }
-        return PurchaseOrderDetailResponseDto.builder().purchaseOrderId(purchaseOrderId).orderItems(itemDtoList).build();
+
+        return PurchaseOrderDetailResponseDto.builder()
+                .purchaseOrderId(purchaseOrderId)
+                .orderItems(itemDtoList)
+                .build();
     }
 }
+
