@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class OutboundCreationServiceImpl implements OutboundCreationService{
     private final OutboundOrderItemRepository outboundOrderItemRepository;
-    private final OutboundCreator outboundCreator;
+    private final OutboundBatchProcessor outboundBatchProcessor;
 
     @Override
     public List<OutboundResponseDto> createOutbound(OutboundRequestDto outboundRequestDto) {
@@ -31,6 +31,6 @@ public class OutboundCreationServiceImpl implements OutboundCreationService{
                 outboundOrderItem -> outboundOrderItem
         ));
 
-        return outboundCreator.createOutbound(outboundRequestDto.getProductList(), orderItemMap);
+        return outboundBatchProcessor.createOutbound(outboundRequestDto.getProductList(), orderItemMap);
     }
 }
