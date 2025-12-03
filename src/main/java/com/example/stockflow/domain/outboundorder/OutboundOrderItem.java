@@ -1,5 +1,6 @@
 package com.example.stockflow.domain.outboundorder;
 
+import com.example.stockflow.domain.outbound.Outbound;
 import com.example.stockflow.domain.product.Product;
 import com.example.stockflow.model.OrderStatus;
 import jakarta.persistence.*;
@@ -60,5 +61,14 @@ public class OutboundOrderItem {
         } else {
             return this.status = OrderStatus.IN_PROGRESS;
         }
+    }
+
+    public Outbound createOutbound(int quantity){
+        if (!this.product.decrease(quantity)){
+            return null;
+        }
+        increaseReleasedQuantity(quantity);
+        applyStatus();
+        return new Outbound(quantity, this);
     }
 }

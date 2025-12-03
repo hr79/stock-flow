@@ -41,10 +41,12 @@ public class Product {
         return this.currentStock;
     }
 
-    public int decrease(int quantity) {
-        if (quantity > this.currentStock) throw new IllegalArgumentException("재고가 부족합니다.");
+    public boolean decrease(int quantity) {
+        if (quantity > this.currentStock) {
+            return false;
+        }
         this.currentStock -= quantity;
-        return this.currentStock;
+        return true;
     }
 
     public boolean isBelowThreshold() {

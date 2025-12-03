@@ -21,11 +21,11 @@ public class OutboundOrder extends BaseEntity {
     private String destination;
 
     @Column(nullable = false)
-    private String status;
+    private OrderStatus status = OrderStatus.REQUESTED;
 
     @Builder
-    public OutboundOrder(String destination, String status) {
+    public OutboundOrder(String destination, OrderStatus status) {
         this.destination = destination;
-        this.status = (status != null) ? status : OrderStatus.REQUESTED.toString();
+        this.status = (status != null) ? status : OrderStatus.REQUESTED;
     }
 }
